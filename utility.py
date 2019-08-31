@@ -7,6 +7,9 @@ import os
 import simplejson as j
 
 
+# TODO: Add test module that tests all functions in this file (that can be tested)
+
+
 # Run the specified command
 def run_cmd(cmd):
     os.system(cmd)
