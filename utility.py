@@ -15,6 +15,29 @@ def run_cmd(cmd):
     os.system(cmd)
 
 
+# Get absolute path of given path
+def get_abs_path(path):
+    if not path.__str__().find(osp.curdir.__str__()):
+        path = osp.abspath(osp.curdir + "\\" + path)
+    return path
+
+
+# Get the first line of the file at the given path
+def get_first_line(path):
+    if does_file_exist(path):
+        path = get_abs_path(path)
+        f = open(path, "r")
+        return f.readline()
+    else:
+        print("File " + path + " does not exist!")
+
+
+# Convert text file to matrix
+def file_to_matrix_arr(path, ignore_header=True):
+    if does_file_exist(path):
+        return None
+
+
 # Make a file given the content and path (where text is a list of str)
 def create_file_if_dne(path, text):
     if not path.__str__().find(osp.curdir.__str__()):
@@ -170,11 +193,6 @@ def map_folder_and_subfolders(my_folder):
 # Flatten a folder list to only contain filepaths to files (ignoring the parent folder)
 def flatten_folder_list(parent, folder_list):
     print("TODO: flatten_folder_list")
-
-
-
-
-
 
 
 # Source 1:

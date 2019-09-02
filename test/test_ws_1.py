@@ -4,6 +4,7 @@
 
 import unittest as ut
 import utility as util
+import ws_func as ws
 import os.path as osp
 import os
 
@@ -19,7 +20,7 @@ print("Initialized " + MODULE_NAME + "test module\n")
 # Run tests on word search function
 class TestWordSearch(ut.TestCase):
 
-    def test_word_search(self):
+    def test_solve_word_search(self):
         actual_out = ""
         ctr = 1
         # Put test folder in path b/c tests will be run from main.py outside of test folder
