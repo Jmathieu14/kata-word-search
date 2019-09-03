@@ -4,7 +4,60 @@
 # Contains functions necessary to find locations of words in given letter matrix
 
 import utility as util
+from enum import Enum as E
 
+
+# Class of enums that represent the original orientation of a given line of text
+class Orientation(E):
+    HORIZONTAL = "horizontal"
+    VERTICAL = "vertical"
+    DIAGONAL = "diagonal"
+
+# Class of enums that represent the original direction of a given line of text
+class Direction(E):
+    RIGHT = "right"
+    LEFT = "left"
+    UP = "up"
+    DOWN = "down"
+
+# A class that stores a line of text and its origin from a WordSearchPuzzle matrix
+class SearchableLine:
+
+    def __init__(self, line: str, ori: Orientation, dirs: [Direction]):
+        self.line = line
+        self.orientation = ori
+        self.directions = dirs
+        print(self)
+
+    def directions_as_pretty_str(self):
+        dir_s = "["
+        for d in self.directions[0:-1]:
+            dir_s = dir_s + "'" + str(d.value) + "', "
+        return dir_s + "'" + str(self.directions[-1].value) + "']"
+
+    def __str__(self):
+        return "SearchableLine {\n" + \
+               "\n\tLine: " + self.line + ", " + \
+               "\n\tOrientation: " + str(self.orientation.value) + ", " + \
+               "\n\tDirections: " + self.directions_as_pretty_str() + \
+               "\n\n}"
+
+
+# A class that stores all lines of searchable text from a matrix of strings as a list of strings
+# [As opposed to a list of a list of strings]
+class SearchableLines:
+    # On init, convert a matrix to a list of all searchable lines in the matrix
+    def __init__(self, matrix: list):
+        self.matrix = matrix
+        self.lines = []
+        self.matrix_to_searchable_strings()
+
+    def matrix_to_searchable_strings(self):
+        # Grab each horizontal 'searchable line' in the matrix
+        for row in self.matrix:
+            line = util.list_to_string(row, sep="")
+            searchable_line = SearchableLine(line, Orientation.HORIZONTAL, [Direction.RIGHT])
+            self.lines.append(searchable_line)
 
 class WordSearchPuzzle:
 
@@ -12,6 +65,7 @@ class WordSearchPuzzle:
         self.path = path
         self.load_words()
         self.load_matrix()
+        self.load_searchable_lines()
 
     def load_words(self):
         w_list_as_str = util.get_first_line(self.path)
@@ -32,8 +86,12 @@ class WordSearchPuzzle:
             line_as_arr[0] = line_as_arr[0].strip()
             self.matrix.append(line_as_arr)
 
+    # Load all searchable lines in matrix
+    def load_searchable_lines(self):
+        self.searchable_lines = SearchableLines(self.matrix)
+
     # Return the matrix in a readable string format
-    def matrix_as_str(self, extra_tab=False):
+    def matrix_as_pretty_str(self, extra_tab=False):
         # Placeholder for our tab character
         tab_ph = "\t"
         # Add extra tab if specified
@@ -56,13 +114,10 @@ class WordSearchPuzzle:
         return "WordSearchPuzzle {\n" + \
                "\n\tPath: " + self.path + ", " + \
                "\n\tWords: " + str(self.words) + ", " + \
-               "\n\tMatrix: " + self.matrix_as_str(extra_tab=True) + \
+               "\n\tMatrix: " + self.matrix_as_pretty_str(extra_tab=True) + \
                "\n\n}"
 
 
-# Solve the word search given the words to find in the given puzzle matrix
-# words: list of strings representing the words to find
-# puzzle_matrix: a multidimensional array representing the positions of each letter in the
-# matrix for the word search problem
-def solve_word_search(words, puzzle_matrix):
+# Solve the word search for the given WordSearchPuzzle
+def solve_word_search(puzzle: WordSearchPuzzle):
     return None

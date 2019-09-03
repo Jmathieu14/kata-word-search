@@ -15,6 +15,14 @@ def run_cmd(cmd):
     os.system(cmd)
 
 
+# Convert an array of strings to a string
+def list_to_string(list, sep=", "):
+    s = ""
+    for l_s in list[0:-1]:
+        s = s + l_s + sep
+    return s + list[-1]
+
+
 # Get absolute path of given path
 def get_abs_path(path):
     if not path.__str__().find(osp.curdir.__str__()):

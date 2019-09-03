@@ -16,6 +16,7 @@ def main():
     puzzle_path1 = "test/input/ws-test-1-input.txt"
     puzzle1 = ws.WordSearchPuzzle(puzzle_path1)
     print(puzzle1)
+    # print(puzzle1.searchable_lines[0])
 
 
 # Run the main method of the main file
