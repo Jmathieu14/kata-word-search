@@ -22,6 +22,18 @@ def get_abs_path(path):
     return path
 
 
+# Get all lines from file as a list of lines (where each line is a string)
+def get_lines_from_file(path, ignore_header=False):
+    if does_file_exist(path):
+        path = get_abs_path(path)
+        f = open(path, "r")
+        lines = f.readlines()
+        # Ignore first line if specified to do so
+        if ignore_header:
+            lines = lines[1:]
+        return lines
+
+
 # Get the first line of the file at the given path
 def get_first_line(path):
     if does_file_exist(path):
@@ -30,12 +42,6 @@ def get_first_line(path):
         return f.readline()
     else:
         print("File " + path + " does not exist!")
-
-
-# Convert text file to matrix
-def file_to_matrix_arr(path, ignore_header=True):
-    if does_file_exist(path):
-        return None
 
 
 # Make a file given the content and path (where text is a list of str)
