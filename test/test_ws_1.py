@@ -7,6 +7,8 @@ import utility as util
 import ws_func as ws
 import os.path as osp
 import os
+# To color messages printed to terminal
+from colorama import Fore, Back, Style
 
 # Set a cap on the number of tests performed per test function
 MAX_TEST_CASES = 100

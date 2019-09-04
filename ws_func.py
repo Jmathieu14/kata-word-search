@@ -5,6 +5,8 @@
 
 import utility as util
 from enum import Enum as E
+# To color messages printed to terminal
+from colorama import Fore, Back, Style
 
 
 # Class of enums that represent the original orientation of a given line of text
@@ -13,12 +15,14 @@ class Orientation(E):
     VERTICAL = "vertical"
     DIAGONAL = "diagonal"
 
+
 # Class of enums that represent the original direction of a given line of text
 class Direction(E):
     RIGHT = "right"
     LEFT = "left"
     UP = "up"
     DOWN = "down"
+
 
 # A class that stores a line of text and its origin from a WordSearchPuzzle matrix
 class SearchableLine:
@@ -59,12 +63,14 @@ class SearchableLines:
             searchable_line = SearchableLine(line, Orientation.HORIZONTAL, [Direction.RIGHT])
             self.lines.append(searchable_line)
 
+
 class WordSearchPuzzle:
 
     def __init__(self, path):
         self.path = path
-        self.load_words()
         self.load_matrix()
+        self.validate_matrix()
+        self.load_words()
         self.load_searchable_lines()
 
     def load_words(self):
@@ -85,6 +91,16 @@ class WordSearchPuzzle:
             line_as_arr[l_arr_len-1] = line_as_arr[l_arr_len-1].strip()
             line_as_arr[0] = line_as_arr[0].strip()
             self.matrix.append(line_as_arr)
+
+    # Make sure the matrix has rows of equal length
+    def validate_matrix(self):
+        # If the matrix exists in the first place
+        if self.matrix != None and self.matrix.__len__() > 0:
+            row_1_len = self.matrix[0].__len__()
+            for i in range(1, self.matrix.__len__()):
+                if self.matrix[i].__len__() != row_1_len:
+                    print(Fore.RED + "Error in given letter matrix: 'One or more rows are of unequal length'" + Fore.RESET)
+                    exit(-1)
 
     # Load all searchable lines in matrix
     def load_searchable_lines(self):
