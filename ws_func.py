@@ -179,6 +179,10 @@ class SearchableLines:
             self.lines.append(vd_searchable_line); self.lines.append(vu_searchable_line)
             col_idx = col_idx + 1
 
+        # This number represents the number of diagonal rows/columns one can expect from the given matrix
+        # for each half (i.e. diagonals going upright/downleft vs. upleft/downright)
+        num_diagonals_per_half = (self.matrix.width + self.matrix.height)/2 - 1
+
 
 class WordSearchPuzzle:
 
