@@ -38,21 +38,25 @@ class Coordinate:
 # Class that represents a matrix of letters
 class LetterMatrix:
     def __init__(self):
-        self.matrix = []
+        self.rows = []
+        self.cols = []
         self.height = 0
         self.width = 0
 
     # Add a row to the Letter Matrix
     def add_row(self, row: [str]):
-        self.matrix.append(row)
+        self.rows.append(row)
+
+    # Add a column to the Letter Matrix
+    def add_col(self, col: [str]):
+        self.cols.append(col)
 
     def update_dimensions(self):
-        self.width = self.matrix[0].__len__()
-        self.height = self.matrix.__len__()
+        self.width = self.rows[0].__len__()
+        self.height = self.rows.__len__()
 
-    # Load a letter matrix to the object from the given file path
-    def load_matrix(self, path: str):
-        line_list = util.get_lines_from_file(path, ignore_header=True)
+    # Load the rows of the letter matrix into the 'rows' field
+    def load_rows(self, line_list: []):
         for line in line_list:
             line_as_arr = line.split(",")
             l_arr_len = line_as_arr.__len__()
@@ -60,10 +64,27 @@ class LetterMatrix:
             line_as_arr[l_arr_len-1] = line_as_arr[l_arr_len-1].strip()
             line_as_arr[0] = line_as_arr[0].strip()
             self.add_row(line_as_arr)
-        self.validate_matrix()
+
+    # Transform our list of rows to a list of columns and store them on the 'cols' field
+    def load_cols(self):
+        for col_i in range(self.width):
+            temp_col = []
+            for row_i in range(self.height):
+                temp_col.append(self.rows[col_i][row_i])
+            self.add_col(temp_col)
+
+    # Load a letter matrix to this object from the given file path
+    def load_matrix(self, path: str):
+        line_list = util.get_lines_from_file(path, ignore_header=True)
+        self.load_rows(line_list)
+        # Validate the rows in the matrix are all of equal length
+        self.validate_rows()
+        # Transform the list of rows to a list of columns; We will make it here only if 'validate_rows'
+        # runs without exiting the program
+        self.load_cols()
 
     # Make sure the matrix has rows of equal length
-    def validate_matrix(self):
+    def validate_rows(self):
         # If the matrix exists in the first place
         if self.matrix != None and self.matrix.__len__() > 0:
             row_1_len = self.matrix[0].__len__()
@@ -74,6 +95,10 @@ class LetterMatrix:
                     exit(-1)
             # If we make it here, then we know we have a valid matrix! Now let's update its dimensions
             self.update_dimensions()
+        else:
+            # The given matrix is of size 0
+            print(Fore.RED + "Error in given letter matrix file: 'No rows found'\n" + Fore.RESET)
+            exit(-1)
 
     # Make a pretty string output of the matrix
     def __str__(self, extra_tab=False):
@@ -134,7 +159,7 @@ class SearchableLines:
     def matrix_to_searchable_strings(self):
         row_idx = 0
         # Grab each horizontal 'searchable line' in the letter matrix
-        for row in self.letters.matrix:
+        for row in self.letters.rows:
             line = util.list_to_string(row, sep="")
             hr_xy = Coordinate(0, row_idx)
             hl_xy = Coordinate(self.letters.width - 1, row_idx)
@@ -145,7 +170,7 @@ class SearchableLines:
             row_idx = row_idx + 1
         col_idx = 0
         # Grab each vertical 'searchable line' in the letter matrix
-        
+
 
 
 class WordSearchPuzzle:
