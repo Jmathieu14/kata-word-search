@@ -15,6 +15,15 @@ def run_cmd(cmd):
     os.system(cmd)
 
 
+# Return a reversed copy of the given string
+def reverse_string(s: str):
+    rs = ""
+    # Useful to know you can use a 'for each' statement on a string in Python :)
+    for c in s:
+        rs = c + rs
+    return rs
+
+
 # Convert an array of strings to a string
 def list_to_string(list, sep=", "):
     s = ""
