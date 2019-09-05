@@ -108,9 +108,9 @@ class LetterMatrix:
         if extra_tab:
             tab_ph = tab_ph + "\t"
         matrix_s = "["
-        last_row = self.matrix.__len__() - 1
-        last_row = self.matrix[last_row]
-        for row in self.matrix:
+        last_row = self.rows.__len__() - 1
+        last_row = self.rows[last_row]
+        for row in self.rows:
             matrix_s = matrix_s + "\n" + tab_ph + str(row)
             if row != last_row:
                 matrix_s = matrix_s + ","
