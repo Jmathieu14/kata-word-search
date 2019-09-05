@@ -86,10 +86,10 @@ class LetterMatrix:
     # Make sure the matrix has rows of equal length
     def validate_rows(self):
         # If the matrix exists in the first place
-        if self.matrix != None and self.matrix.__len__() > 0:
-            row_1_len = self.matrix[0].__len__()
-            for i in range(1, self.matrix.__len__()):
-                if self.matrix[i].__len__() != row_1_len:
+        if self.rows != None and self.rows.__len__() > 0:
+            row_1_len = self.rows[0].__len__()
+            for i in range(1, self.rows.__len__()):
+                if self.rows[i].__len__() != row_1_len:
                     print(Fore.RED + "Error in given letter matrix: 'One or more rows are of "
                                      "unequal length'" + Fore.RESET)
                     exit(-1)
@@ -151,26 +151,33 @@ class SearchableLine:
 # [As opposed to a list of a list of strings]
 class SearchableLines:
     # On init, convert a matrix to a list of all searchable lines in the matrix
-    def __init__(self, letters: LetterMatrix):
-        self.letters = letters
+    def __init__(self, matrix: LetterMatrix):
+        self.matrix = matrix
         self.lines = []
         self.matrix_to_searchable_strings()
 
     def matrix_to_searchable_strings(self):
         row_idx = 0
         # Grab each horizontal 'searchable line' in the letter matrix
-        for row in self.letters.rows:
+        for row in self.matrix.rows:
             line = util.list_to_string(row, sep="")
             hr_xy = Coordinate(0, row_idx)
-            hl_xy = Coordinate(self.letters.width - 1, row_idx)
+            hl_xy = Coordinate(self.matrix.width - 1, row_idx)
             hr_searchable_line = SearchableLine(line, hr_xy, Orientation.HORIZONTAL, [Direction.RIGHT])
             hl_searchable_line = SearchableLine(util.reverse_string(line), hl_xy, Orientation.HORIZONTAL, [Direction.LEFT])
             self.lines.append(hr_searchable_line); self.lines.append(hl_searchable_line)
-
             row_idx = row_idx + 1
+
         col_idx = 0
         # Grab each vertical 'searchable line' in the letter matrix
-
+        for col in self.matrix.cols:
+            line = util.list_to_string(col, sep="")
+            vu_xy = Coordinate(0, row_idx)
+            vd_xy = Coordinate(self.matrix.width - 1, row_idx)
+            vu_searchable_line = SearchableLine(line, vu_xy, Orientation.VERTICAL, [Direction.UP])
+            vd_searchable_line = SearchableLine(util.reverse_string(line), vd_xy, Orientation.VERTICAL, [Direction.DOWN])
+            self.lines.append(vu_searchable_line); self.lines.append(vd_searchable_line)
+            col_idx = col_idx + 1
 
 
 class WordSearchPuzzle:
