@@ -28,11 +28,27 @@ class Direction(E):
 class Coordinate:
 
     def __init__(self, x_col: int, y_row: int):
-        self.x = x_col
-        self.y = y_row
+        self.x_col = x_col
+        self.y_row = y_row
+
+    # Is the coordinate in bounds of the given dimensions? (Where max_width and max_height are one greater
+    # than the last in bound index)
+    def is_inbound(self, max_width: int, max_height: int):
+        return self.x_col >= 0 and self.y_row >= 0 and self.x_col < max_width and self.y_row < max_height
+
+    # Modify the specified axis using the given operation by a default amount of 1
+    def modify(self, axis: str, op: str, amount = 1):
+        if op == "subtract" or op == "sub" or op == "minus":
+            amount = amount * -1
+        # Otherwise, assume add operation
+        if axis == "x_col" or axis == "col_x":
+            self.x_col = self.x_col + amount
+        # Otherwiase assume operation applies to y_row field
+        else:
+            self.y_row = self.y_row + amount
 
     def __str__(self):
-        return "(" + str(self.x) + "," + str(self.y) + ")"
+        return "(" + str(self.x_col) + "," + str(self.y_row) + ")"
 
 
 # Class that represents a matrix of letters
@@ -42,6 +58,12 @@ class LetterMatrix:
         self.cols = []
         self.height = 0
         self.width = 0
+
+    # Return the letter at the given coordinate
+    def get_letter_at_coord(self, coord: Coordinate):
+        # If given a valid coordinate
+        if coord.is_inbound(self.width, self.height):
+            return self.rows[coord.y_row][coord.x_col]
 
     # Add a row to the Letter Matrix
     def add_row(self, row: [str]):
@@ -181,7 +203,20 @@ class SearchableLines:
 
         # This number represents the number of diagonal rows/columns one can expect from the given matrix
         # for each half (i.e. diagonals going upright/downleft vs. upleft/downright)
-        num_diagonals_per_half = (self.matrix.width + self.matrix.height)/2 - 1
+        num_diagonals_per_half = (int) ((self.matrix.width + self.matrix.height)/2 - 1)
+        for dia in range(num_diagonals_per_half):
+            diag_str = ""
+            temp_coord = Coordinate(0, dia)
+            # Increment coordinate diagonally up and to the right until out of bounds, then move on to the next
+            # diagonal
+            while temp_coord.is_inbound(self.matrix.width, self.matrix.height):
+                diag_str = diag_str + self.matrix.get_letter_at_coord(temp_coord)
+                temp_coord.modify("x_col", "add"); temp_coord.modify("y_col", "add")
+
+            up_right_diag = diag_str
+            down_left_diag = util.reverse_string(diag_str)
+
+
 
 
 class WordSearchPuzzle:
