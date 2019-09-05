@@ -70,7 +70,7 @@ class LetterMatrix:
         for col_i in range(self.width):
             temp_col = []
             for row_i in range(self.height):
-                temp_col.append(self.rows[col_i][row_i])
+                temp_col.append(self.rows[row_i][col_i])
             self.add_col(temp_col)
 
     # Load a letter matrix to this object from the given file path
@@ -172,11 +172,11 @@ class SearchableLines:
         # Grab each vertical 'searchable line' in the letter matrix
         for col in self.matrix.cols:
             line = util.list_to_string(col, sep="")
-            vu_xy = Coordinate(0, row_idx)
-            vd_xy = Coordinate(self.matrix.width - 1, row_idx)
-            vu_searchable_line = SearchableLine(line, vu_xy, Orientation.VERTICAL, [Direction.UP])
-            vd_searchable_line = SearchableLine(util.reverse_string(line), vd_xy, Orientation.VERTICAL, [Direction.DOWN])
-            self.lines.append(vu_searchable_line); self.lines.append(vd_searchable_line)
+            vd_xy = Coordinate(col_idx, 0)
+            vu_xy = Coordinate(col_idx, self.matrix.height - 1)
+            vd_searchable_line = SearchableLine(line, vd_xy, Orientation.VERTICAL, [Direction.DOWN])
+            vu_searchable_line = SearchableLine(util.reverse_string(line), vu_xy, Orientation.VERTICAL, [Direction.UP])
+            self.lines.append(vd_searchable_line); self.lines.append(vu_searchable_line)
             col_idx = col_idx + 1
 
 
