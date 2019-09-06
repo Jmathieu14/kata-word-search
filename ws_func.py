@@ -178,6 +178,9 @@ class SearchableLines:
         self.lines = []
         self.matrix_to_searchable_strings()
 
+    def get_diagonal_searchable_string(self, starting_coord: Coordinate, x_col_op: str, y_row_op: str):
+        1
+
     def matrix_to_searchable_strings(self):
         row_idx = 0
         # Grab each horizontal 'searchable line' in the letter matrix
@@ -201,20 +204,30 @@ class SearchableLines:
             self.lines.append(vd_searchable_line); self.lines.append(vu_searchable_line)
             col_idx = col_idx + 1
 
-        # This number represents the number of diagonal rows/columns one can expect from the given matrix
-        # for each half (i.e. diagonals going upright/downleft vs. upleft/downright)
-        num_diagonals_per_half = (int) ((self.matrix.width + self.matrix.height)/2 - 1)
-        for dia in range(num_diagonals_per_half):
-            diag_str = ""
-            temp_coord = Coordinate(0, dia)
-            # Increment coordinate diagonally up and to the right until out of bounds, then move on to the next
-            # diagonal
-            while temp_coord.is_inbound(self.matrix.width, self.matrix.height):
-                diag_str = diag_str + self.matrix.get_letter_at_coord(temp_coord)
-                temp_coord.modify("x_col", "add"); temp_coord.modify("y_col", "add")
+        # To get all diagonal searchable lines, we will need to start at column 0 and go from row 0 to row 'n'. After we
+        # reach the last row, we then begin to increment the column number until column 'n' while the row remains at 'n'
+        col_idx = 0
+        row_idx = 0
+        while row_idx < self.matrix.height and col_idx < self.matrix.width:
 
-            up_right_diag = diag_str
-            down_left_diag = util.reverse_string(diag_str)
+            # Up Right diagonal string
+            ur_diag_s = ""
+            temp_coord = Coordinate(col_idx, row_idx)
+            # Increment coordinate diagonally up and to the right by one unit until out of bounds,
+            # then move on to the next diagonal
+            while temp_coord.is_inbound(self.matrix.width, self.matrix.height):
+                ur_diag_s = ur_diag_s + self.matrix.get_letter_at_coord(temp_coord)
+                temp_coord.modify("x_col", "add"); temp_coord.modify("y_row", "add")
+
+            up_right_diag = ur_diag_s
+            down_left_diag = util.reverse_string(ur_diag_s)
+
+            # If we reach the last row, start increasing the column index
+            if row_idx + 1 >= self.matrix.height:
+                col_idx = col_idx + 1
+            # Otherwise continue until we get to the last row
+            else:
+                row_idx = row_idx + 1
 
 
 
