@@ -157,7 +157,7 @@ class SearchableLine:
         self.directions = dirs
         self.width = self.line.__len__()
         self.xy_origin = xy_origin
-        print(self)
+        # print(self)
 
     def directions_as_pretty_str(self):
         dir_s = "["
@@ -182,6 +182,10 @@ class SearchableLines:
         self.matrix = matrix
         self.lines = []
         self.matrix_to_searchable_strings()
+
+    # Return the number of lines in the SearchableLines object
+    def num_of_lines(self):
+        return self.lines.__len__()
 
     # Return the diagonal string found with the given coordinate and coordinate operations
     # and return the end coordinate as a dict
