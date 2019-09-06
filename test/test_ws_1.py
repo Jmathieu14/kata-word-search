@@ -66,6 +66,10 @@ class TestWordSearchPuzzle(ut.TestCase):
                      + " number is incorrect.")
 
     def test_solve_word_search(self):
+        # $ represents 'input' or 'output', and # represents number of file
+        # Put test folder in path b/c tests will be run from main.py outside of test folder
+        base_test_name = "test/$/ws-test-#-$.txt"
+        test_files = self.get_test_files(base_test_name)
         actual_out = ""
         self.assertTrue(1, 1)
 
