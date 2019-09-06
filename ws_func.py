@@ -31,6 +31,11 @@ class Coordinate:
         self.x_col = x_col
         self.y_row = y_row
 
+    # Update this coordinate to the new x and y values
+    def update(self, x_val: int, y_val: int):
+        self.x_col = x_val
+        self.y_row = y_val
+
     # Is the coordinate in bounds of the given dimensions? (Where max_width and max_height are one greater
     # than the last in bound index)
     def is_inbound(self, max_width: int, max_height: int):
@@ -163,7 +168,7 @@ class SearchableLine:
     def __str__(self):
         return "SearchableLine {\n" + \
                "\n\tLine: " + self.line + ", Width: " + str(self.width) + ", " + \
-               "\n\tOrigin:" + str(self.xy_origin) + ", " + \
+               "\n\tOrigin: " + str(self.xy_origin) + ", " + \
                "\n\tOrientation: " + str(self.orientation.value) + ", " + \
                "\n\tDirection(s): " + self.directions_as_pretty_str() + \
                "\n\n}"
@@ -182,11 +187,12 @@ class SearchableLines:
     # and return the end coordinate as a dict
     def get_diag_str_plus_coord(self, starting_coord: Coordinate, x_col_op: str, y_row_op: str):
         diag_s = ""
+        cur_coord = Coordinate(starting_coord.x_col, starting_coord.y_row)
         end_coord = Coordinate(0, 0)
-        while starting_coord.is_inbound(self.matrix.width, self.matrix.height):
-            diag_s = diag_s + self.matrix.get_letter_at_coord(starting_coord)
-            end_coord = starting_coord
-            starting_coord.modify("x_col", x_col_op); starting_coord.modify("y_row", y_row_op)
+        while cur_coord.is_inbound(self.matrix.width, self.matrix.height):
+            diag_s = diag_s + self.matrix.get_letter_at_coord(cur_coord)
+            end_coord.update(cur_coord.x_col, cur_coord.y_row)
+            cur_coord.modify("x_col", x_col_op); cur_coord.modify("y_row", y_row_op)
         return { "str": diag_s, "coord": end_coord }
 
     def matrix_to_searchable_strings(self):
@@ -214,6 +220,7 @@ class SearchableLines:
 
         # To get all diagonal searchable lines, we will need to start at column 0 and go from row 0 to row 'n'. After we
         # reach the last row, we then begin to increment the column number until column 'n' while the row remains at 'n'
+        # *NOTE: This only gets all diagonal lines that go up right and down left.*
         # ---------->
         # |   0 1 n
         # | 0 X X X
@@ -223,7 +230,8 @@ class SearchableLines:
 
         col_idx = 0
         row_idx = 0
-        while row_idx < self.matrix.height and col_idx < self.matrix.width:
+        # Iterate for up right/down left diagonals by increasing row value and then by increasing column value
+        while col_idx < self.matrix.width:
 
             cur_coord = Coordinate(col_idx, row_idx)
             # Increment coordinate diagonally up and to the right by one unit until out of bounds
@@ -234,20 +242,11 @@ class SearchableLines:
             down_left_diag = util.reverse_string(up_right_diag)
             down_left_coord = ur_diag_plus_coord['coord']
 
-            # Now increment coordinate to the right and down one unit; Store on our Down Right diagonal str variable
-            dr_diag_plus_coord = self.get_diag_str_plus_coord(cur_coord, x_col_op="add", y_row_op="add")
-            down_right_diag = dr_diag_plus_coord['str']
-            # Reverse for our Up Left diagonal string
-            up_left_diag = util.reverse_string(down_right_diag)
-            up_left_coord = dr_diag_plus_coord['coord']
-
             # Now that we have each diagonal line and the relavent starting coordinates for them, let us add that to
             # this object!
             ur_sl = SearchableLine(up_right_diag, cur_coord, Orientation.DIAGONAL, [Direction.UP, Direction.RIGHT])
             dl_sl = SearchableLine(down_left_diag, down_left_coord, Orientation.DIAGONAL, [Direction.DOWN, Direction.LEFT])
-            dr_sl = SearchableLine(down_right_diag, cur_coord, Orientation.DIAGONAL, [Direction.DOWN, Direction.RIGHT])
-            ul_sl = SearchableLine(up_left_diag, up_left_coord, Orientation.DIAGONAL, [Direction.UP, Direction.LEFT])
-            self.lines.append(ur_sl); self.lines.append(dl_sl); self.lines.append(dr_sl); self.lines.append(ul_sl)
+            self.lines.append(ur_sl); self.lines.append(dl_sl)
 
             # If we reach the last row, start increasing the column index
             if row_idx + 1 >= self.matrix.height:
@@ -255,6 +254,29 @@ class SearchableLines:
             # Otherwise continue until we get to the last row
             else:
                 row_idx = row_idx + 1
+
+        col_idx = self.matrix.width - 1
+        row_idx = 0
+        # Iterate for down right/up left diagonals by decreasing column value and then by increasing row value
+        while row_idx < self.matrix.height:
+
+            cur_coord = Coordinate(col_idx, row_idx)
+            # Now increment coordinate to the right and down one unit; Store on our Down Right diagonal str variable
+            dr_diag_plus_coord = self.get_diag_str_plus_coord(cur_coord, x_col_op="add", y_row_op="add")
+            down_right_diag = dr_diag_plus_coord['str']
+            # Reverse for our Up Left diagonal string
+            up_left_diag = util.reverse_string(down_right_diag)
+            up_left_coord = dr_diag_plus_coord['coord']
+            # Add lines to lines field
+            dr_sl = SearchableLine(down_right_diag, cur_coord, Orientation.DIAGONAL, [Direction.DOWN, Direction.RIGHT])
+            ul_sl = SearchableLine(up_left_diag, up_left_coord, Orientation.DIAGONAL, [Direction.UP, Direction.LEFT])
+            self.lines.append(dr_sl); self.lines.append(ul_sl)
+            # If we reach the first column, start increasing the row index
+            if col_idx - 1 < 0:
+                row_idx = row_idx + 1
+            # Otherwise continue until we get to the first column
+            else:
+                col_idx = col_idx - 1
 
 
 class WordSearchPuzzle:
