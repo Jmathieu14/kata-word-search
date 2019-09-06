@@ -178,8 +178,16 @@ class SearchableLines:
         self.lines = []
         self.matrix_to_searchable_strings()
 
-    def get_diagonal_searchable_string(self, starting_coord: Coordinate, x_col_op: str, y_row_op: str):
-        1
+    # Return the diagonal string found with the given coordinate and coordinate operations
+    # and return the end coordinate as a dict
+    def get_diag_str_plus_coord(self, starting_coord: Coordinate, x_col_op: str, y_row_op: str):
+        diag_s = ""
+        end_coord = Coordinate(0, 0)
+        while starting_coord.is_inbound(self.matrix.width, self.matrix.height):
+            diag_s = diag_s + self.matrix.get_letter_at_coord(starting_coord)
+            end_coord = starting_coord
+            starting_coord.modify("x_col", x_col_op); starting_coord.modify("y_row", y_row_op)
+        return { "str": diag_s, "coord": end_coord }
 
     def matrix_to_searchable_strings(self):
         row_idx = 0
@@ -206,21 +214,40 @@ class SearchableLines:
 
         # To get all diagonal searchable lines, we will need to start at column 0 and go from row 0 to row 'n'. After we
         # reach the last row, we then begin to increment the column number until column 'n' while the row remains at 'n'
+        # ---------->
+        # |   0 1 n
+        # | 0 X X X
+        # | 1 X X X
+        # | n X X X
+        # v
+
         col_idx = 0
         row_idx = 0
         while row_idx < self.matrix.height and col_idx < self.matrix.width:
 
-            # Up Right diagonal string
-            ur_diag_s = ""
-            temp_coord = Coordinate(col_idx, row_idx)
-            # Increment coordinate diagonally up and to the right by one unit until out of bounds,
-            # then move on to the next diagonal
-            while temp_coord.is_inbound(self.matrix.width, self.matrix.height):
-                ur_diag_s = ur_diag_s + self.matrix.get_letter_at_coord(temp_coord)
-                temp_coord.modify("x_col", "add"); temp_coord.modify("y_row", "add")
+            cur_coord = Coordinate(col_idx, row_idx)
+            # Increment coordinate diagonally up and to the right by one unit until out of bounds
+            # Return the resulting string to our Up Right diagonal string variable
+            ur_diag_plus_coord = self.get_diag_str_plus_coord(cur_coord, x_col_op="add", y_row_op="sub")
+            up_right_diag = ur_diag_plus_coord['str']
+            # Reverse for our Down Left diagonal string
+            down_left_diag = util.reverse_string(up_right_diag)
+            down_left_coord = ur_diag_plus_coord['coord']
 
-            up_right_diag = ur_diag_s
-            down_left_diag = util.reverse_string(ur_diag_s)
+            # Now increment coordinate to the right and down one unit; Store on our Down Right diagonal str variable
+            dr_diag_plus_coord = self.get_diag_str_plus_coord(cur_coord, x_col_op="add", y_row_op="add")
+            down_right_diag = dr_diag_plus_coord['str']
+            # Reverse for our Up Left diagonal string
+            up_left_diag = util.reverse_string(down_right_diag)
+            up_left_coord = dr_diag_plus_coord['coord']
+
+            # Now that we have each diagonal line and the relavent starting coordinates for them, let us add that to
+            # this object!
+            ur_sl = SearchableLine(up_right_diag, cur_coord, Orientation.DIAGONAL, [Direction.UP, Direction.RIGHT])
+            dl_sl = SearchableLine(down_left_diag, down_left_coord, Orientation.DIAGONAL, [Direction.DOWN, Direction.LEFT])
+            dr_sl = SearchableLine(down_right_diag, cur_coord, Orientation.DIAGONAL, [Direction.DOWN, Direction.RIGHT])
+            ul_sl = SearchableLine(up_left_diag, up_left_coord, Orientation.DIAGONAL, [Direction.UP, Direction.LEFT])
+            self.lines.append(ur_sl); self.lines.append(dl_sl); self.lines.append(dr_sl); self.lines.append(ul_sl)
 
             # If we reach the last row, start increasing the column index
             if row_idx + 1 >= self.matrix.height:
@@ -228,8 +255,6 @@ class SearchableLines:
             # Otherwise continue until we get to the last row
             else:
                 row_idx = row_idx + 1
-
-
 
 
 class WordSearchPuzzle:
