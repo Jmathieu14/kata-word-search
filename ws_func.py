@@ -429,13 +429,15 @@ class WordSearchPuzzle:
     # Solve the WordSearchPuzzle!
     def solve(self):
         if self.words_loaded and self.lines_loaded:
+            solution = ""
             for word in self.words:
                 for searchable_line in self.searchable_lines.lines:
                     # The searchable line string
-                    coords = searchable_line.find_coords_as_str(substr=word)
+                    coords_str = searchable_line.find_coords_as_str(substr=word)
                     # If it's not None, we have found the word in our searchable line!
-                    if coords is not None:
-                        return coords
+                    if coords_str is not None:
+                        solution = solution + coords_str + "\n"
+            return solution
 
     def __str__(self):
         return "WordSearchPuzzle {\n" + \

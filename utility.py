@@ -50,6 +50,16 @@ def get_lines_from_file(path, ignore_header=False):
             lines = lines[1:]
         return lines
 
+# Get all lines from file as a string of lines
+def get_lines_as_str_from_file(path, ignore_header=False, strip=False):
+    line_list = get_lines_from_file(path, ignore_header)
+    s = ""
+    for line in line_list:
+        cur_line = line
+        if strip:
+            cur_line = line.strip()
+        s = s + cur_line
+    return s
 
 # Get the first line of the file at the given path
 def get_first_line(path):

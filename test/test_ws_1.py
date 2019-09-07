@@ -73,8 +73,8 @@ class TestWordSearchPuzzle(ut.TestCase):
         for f in test_files:
             test_puzzle = ws.WordSearchPuzzle(f['in'])
             actual_out = test_puzzle.solve()
-            expected_out = util.get_lines_from_file(f['out'])
-        self.assertTrue(1, 1)
+            expected_out = util.get_lines_as_str_from_file(f['out'])
+            self.assertEqual(actual_out, expected_out, msg="The actual out does NOT equal the expected out.")
 
 
 # Run tests through command line
