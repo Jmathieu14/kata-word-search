@@ -9,15 +9,14 @@ import unittest as ut
 
 
 # What to run for the bulk of the project
-def main():
+def main(input_path):
     # Run the test_ws_1 test module
     wst1.run_tests()
     print("\nRunning Kata Word Search Project\n")
-    puzzle_path1 = "input/readme-example-input.txt"
-    puzzle1 = ws.WordSearchPuzzle(puzzle_path1)
-    # print(puzzle1)
-    # print(puzzle1.searchable_lines[0])
+    puzzle = ws.WordSearchPuzzle(input_path)
+    print(puzzle.solve())
 
 
 # Run the main method of the main file
-main()
+example_path1 = "input/readme-example-input.txt"
+main(example_path1)

@@ -79,3 +79,7 @@ UHURA: (4,0),(3,1),(2,2),(1,3),(0,4)
 
 *How long or short can the words be?*<br />
 * Words will be a minimum of two letters long, and will always fit within the grid along the axis on which it can be located.
+
+## Directions ##
+To run this program and solve a word puzzle, call the main function from main.py and input a valid word search table file.
+An example of valid input can be found at '/input/readme-example-input.txt'.
