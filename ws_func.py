@@ -31,10 +31,30 @@ class Coordinate:
         self.x_col = x_col
         self.y_row = y_row
 
+    # See if this coordinate equals another
+    def equals(self, other):
+        return self.x_col == other.x_col and self.y_row == other.y_row
+
     # Update this coordinate to the new x and y values
     def update(self, x_val: int, y_val: int):
         self.x_col = x_val
         self.y_row = y_val
+
+    # Return this Coordinate's axis that matches the given string axis
+    def get_axis(self, axis: str):
+        if axis == "x_col" or axis == "col_x":
+            return self.x_col
+        # Otherwise assume y row was requested
+        else:
+            return self.y_row
+
+    # Set the value of the specified axis to the given value
+    def set_axis(self, axis: str, value: int):
+        if axis == "x_col" or axis == "col_x":
+            self.x_col = value
+        # Otherwise assume y row was requested
+        else:
+            self.y_row = value
 
     # Is the coordinate in bounds of the given dimensions? (Where max_width and max_height are one greater
     # than the last in bound index)
@@ -51,6 +71,11 @@ class Coordinate:
         # Otherwiase assume operation applies to y_row field
         else:
             self.y_row = self.y_row + amount
+        return self
+
+    # Return a copy of this Coordinate
+    def copy(self):
+        return Coordinate(self.x_col, self.y_row)
 
     def __str__(self):
         return "(" + str(self.x_col) + "," + str(self.y_row) + ")"
@@ -158,6 +183,28 @@ class SearchableLine:
         self.width = self.line.__len__()
         self.xy_origin = xy_origin
 
+    def gen_coords_in_range(self, start: Coordinate, end: Coordinate, axes_plus_ops: [{}]):
+        coord_list = []
+        coord_list_filled = False
+        for axis_op in axes_plus_ops:
+            temp_coord = start.copy()
+            coord_list_idx = 0
+            # While the temp_coord does not have the same x or y axis as does the end coordinate...
+            while temp_coord.modify(axis=axis_op['axis'], op=axis_op['op']).get_axis(axis_op['axis']) \
+                    != end.get_axis(axis_op['axis']):
+                # print("Temp: " + str(temp_coord) + " vs. End: " + str(end))
+                if coord_list_filled == False:
+                    coord_list.append(temp_coord.copy())
+                else:
+                    coord_list[coord_list_idx].set_axis(axis=axis_op['axis'],
+                                                        value=temp_coord.get_axis(axis_op['axis']))
+                coord_list_idx = coord_list_idx + 1
+            coord_list_filled = True
+
+        coord_list.insert(0, start.copy())
+        coord_list.append(end.copy())
+        return coord_list
+
     # Find the coordinates of the given substring in the line field of this SearchableLine using its orientation and
     # direction to determine these coordinates in relation to its position in a LetterMatrix
     def find_coord_range(self, substr: str):
@@ -165,8 +212,11 @@ class SearchableLine:
         # If idx is > -1, the substring IS in the string 'line' field
         if idx > -1:
             sub_len_1 = substr.__len__() - 1
-            last_point = Coordinate(self.xy_origin.x_col, self.xy_origin.y_row)
+            end_point = Coordinate(self.xy_origin.x_col, self.xy_origin.y_row)
             starting_point = Coordinate(self.xy_origin.x_col, self.xy_origin.y_row)
+            # The operations to apply to the specified axes to generate all points from the starting_point
+            # to the end_point
+            axes_ops = []
 
             # The following two code blocks calculate the starting and end point of the substring in this line in
             # relation to the LetterMatrix it is a part of.
@@ -175,46 +225,37 @@ class SearchableLine:
             if Direction.RIGHT in self.directions:
             # Add idx to the x value of this line's point of origin
                 starting_point.modify("x_col", "add", amount=idx)
-                last_point.update(starting_point.x_col + sub_len_1, last_point.y_row)
+                end_point.update(starting_point.x_col + sub_len_1, end_point.y_row)
+                axes_ops.append({'axis': 'x_col', 'op': 'add'})
             elif Direction.LEFT in self.directions:
             # Subtract idx from the x value of this line's point of origin
                 starting_point.modify("x_col", "minus", amount=idx)
-                last_point.update(starting_point.x_col - sub_len_1, last_point.y_row)
+                end_point.update(starting_point.x_col - sub_len_1, end_point.y_row)
+                axes_ops.append({'axis': 'x_col', 'op': 'minus'})
 
             # (Calculate the y value for starting point; Calculate y value for end point)
             if Direction.UP in self.directions:
                 starting_point.modify("y_row", "minus", amount=idx)
-                last_point.update(last_point.x_col, starting_point.y_row - sub_len_1)
+                end_point.update(end_point.x_col, starting_point.y_row - sub_len_1)
+                axes_ops.append({'axis': 'y_row', 'op': 'minus'})
             elif Direction.DOWN in self.directions:
                 starting_point.modify("y_row", "add", amount=idx)
-                last_point.update(last_point.x_col, starting_point.y_row + sub_len_1)
+                end_point.update(end_point.x_col, starting_point.y_row + sub_len_1)
+                axes_ops.append({'axis': 'y_row', 'op': 'add'})
 
-            return { "range": [starting_point, last_point] }
+            print(axes_ops)
+            coord_list = self.gen_coords_in_range(starting_point, end_point, axes_ops)
 
-    # Get every coordinate between the given the start and end coordinate; Whole integers only
-    def get_all_coords_in_range(self, start: Coordinate, end: Coordinate):
-        y = (start.y_row - end.y_row)
-        x = (start.x_col - end.x_col)
-        m = "Undefined"
-        if x != 0:
-            m = y/x
-        all_coords = []
-        all_coords.append(start)
-        if m == "Undefined":
-            print("x + 1 = " + str(start.x_col+1) + "; n - 1 = " + str(x-1))
-            for cur_x in range(start.x_col+1, x-1):
-                all_coords.append(Coordinate(cur_x, start.y_row))
-        # print("Slope is: " + str(m))
-        all_coords.append(end)
-        return all_coords
+            return { "range": coord_list }
 
     # Return a list of Coordinates as a string
     def coord_list_to_str(self, coords: [Coordinate]):
         if coords is not None and coords.__len__() > 0:
+            print(coords[0])
             s = ""
             for i in range(0, coords.__len__()-1):
                 s = s + str(coords[i]) + ","
-            return s + str(coords[-1])
+            return s #+ str(coords[coords.__len__()-1])
         else:
             return "<No Coordinates>"
 
@@ -223,10 +264,7 @@ class SearchableLine:
         coords = self.find_coord_range(substr)
         # If the coordinates ARE found
         if coords is not None:
-            start = coords['range'][0]; end = coords['range'][1]
-            all_coords = self.get_all_coords_in_range(start, end)
-
-            return substr + ": " + self.coord_list_to_str(all_coords)
+            return substr + ": " + self.coord_list_to_str(coords)
 
     def directions_as_pretty_str(self):
         dir_s = "["
