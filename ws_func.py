@@ -200,14 +200,16 @@ class SearchableLine:
                                                         value=temp_coord.get_axis(axis_op['axis']))
                 coord_list_idx = coord_list_idx + 1
             coord_list_filled = True
-
-        coord_list.insert(0, start.copy())
+        if coord_list.__len__() == 0:
+            coord_list.append(start.copy())
+        else:
+            coord_list.insert(0, start.copy())
         coord_list.append(end.copy())
         return coord_list
 
     # Find the coordinates of the given substring in the line field of this SearchableLine using its orientation and
     # direction to determine these coordinates in relation to its position in a LetterMatrix
-    def find_coord_range(self, substr: str):
+    def find_coords(self, substr: str):
         idx = self.line.find(substr)
         # If idx is > -1, the substring IS in the string 'line' field
         if idx > -1:
@@ -243,25 +245,26 @@ class SearchableLine:
                 end_point.update(end_point.x_col, starting_point.y_row + sub_len_1)
                 axes_ops.append({'axis': 'y_row', 'op': 'add'})
 
-            print(axes_ops)
+            # Generate the entire coordinate list as specified with the start and end points
+            # along with appropriate operations to perform on the specified axes
             coord_list = self.gen_coords_in_range(starting_point, end_point, axes_ops)
 
-            return { "range": coord_list }
+            return coord_list
 
     # Return a list of Coordinates as a string
     def coord_list_to_str(self, coords: [Coordinate]):
         if coords is not None and coords.__len__() > 0:
-            print(coords[0])
+            # print(coords)
             s = ""
             for i in range(0, coords.__len__()-1):
                 s = s + str(coords[i]) + ","
-            return s #+ str(coords[coords.__len__()-1])
+            return s + str(coords[coords.__len__()-1])
         else:
             return "<No Coordinates>"
 
     # Do the same as above, but return as a string
-    def find_coord_range_as_str(self, substr: str):
-        coords = self.find_coord_range(substr)
+    def find_coords_as_str(self, substr: str):
+        coords = self.find_coords(substr)
         # If the coordinates ARE found
         if coords is not None:
             return substr + ": " + self.coord_list_to_str(coords)
@@ -429,11 +432,10 @@ class WordSearchPuzzle:
             for word in self.words:
                 for searchable_line in self.searchable_lines.lines:
                     # The searchable line string
-                    coords = searchable_line.find_coord_range_as_str(substr=word)
+                    coords = searchable_line.find_coords_as_str(substr=word)
                     # If it's not None, we have found the word in our searchable line!
                     if coords is not None:
-                        print(coords)
-
+                        return coords
 
     def __str__(self):
         return "WordSearchPuzzle {\n" + \
