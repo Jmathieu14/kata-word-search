@@ -164,29 +164,69 @@ class SearchableLine:
         idx = self.line.find(substr)
         # If idx is > -1, the substring IS in the string 'line' field
         if idx > -1:
-            final_idx = 0
             sub_len_1 = substr.__len__() - 1
-            last_point = Coordinate(0, 0)
-            if self.orientation == Orientation.HORIZONTAL and Direction.RIGHT in self.directions:
-                # Just add sub_len to x value of self.xy_origin for the last point; Add idx to x value of origin of
-                # the line
-                self.xy_origin.modify("x_col", "add", amount=idx)
-                last_point.update(self.xy_origin.x_col + sub_len_1, self.xy_origin.y_row)
-            elif self.orientation == Orientation.HORIZONTAL and Direction.LEFT in self.directions:
-                # Just subtract sub_len from the x value of self.xy_origin for the last point; Subtract idx from
-                # the x value of origin of the line
-                self.xy_origin.modify("x_col", "minus", amount=idx)
-                last_point.update(self.xy_origin.x_col - sub_len_1, self.xy_origin.y_row)
+            last_point = Coordinate(self.xy_origin.x_col, self.xy_origin.y_row)
+            starting_point = Coordinate(self.xy_origin.x_col, self.xy_origin.y_row)
 
-            return {"range": [self.xy_origin, last_point]}
+            # The following two code blocks calculate the starting and end point of the substring in this line in
+            # relation to the LetterMatrix it is a part of.
+
+            # (Calculate the x value for starting point; Calculate x value for end point)
+            if Direction.RIGHT in self.directions:
+            # Add idx to the x value of this line's point of origin
+                starting_point.modify("x_col", "add", amount=idx)
+                last_point.update(starting_point.x_col + sub_len_1, last_point.y_row)
+            elif Direction.LEFT in self.directions:
+            # Subtract idx from the x value of this line's point of origin
+                starting_point.modify("x_col", "minus", amount=idx)
+                last_point.update(starting_point.x_col - sub_len_1, last_point.y_row)
+
+            # (Calculate the y value for starting point; Calculate y value for end point)
+            if Direction.UP in self.directions:
+                starting_point.modify("y_row", "minus", amount=idx)
+                last_point.update(last_point.x_col, starting_point.y_row - sub_len_1)
+            elif Direction.DOWN in self.directions:
+                starting_point.modify("y_row", "add", amount=idx)
+                last_point.update(last_point.x_col, starting_point.y_row + sub_len_1)
+
+            return { "range": [starting_point, last_point] }
+
+    # Get every coordinate between the given the start and end coordinate; Whole integers only
+    def get_all_coords_in_range(self, start: Coordinate, end: Coordinate):
+        y = (start.y_row - end.y_row)
+        x = (start.x_col - end.x_col)
+        m = "Undefined"
+        if x != 0:
+            m = y/x
+        all_coords = []
+        all_coords.append(start)
+        if m == "Undefined":
+            print("x + 1 = " + str(start.x_col+1) + "; n - 1 = " + str(x-1))
+            for cur_x in range(start.x_col+1, x-1):
+                all_coords.append(Coordinate(cur_x, start.y_row))
+        # print("Slope is: " + str(m))
+        all_coords.append(end)
+        return all_coords
+
+    # Return a list of Coordinates as a string
+    def coord_list_to_str(self, coords: [Coordinate]):
+        if coords is not None and coords.__len__() > 0:
+            s = ""
+            for i in range(0, coords.__len__()-1):
+                s = s + str(coords[i]) + ","
+            return s + str(coords[-1])
+        else:
+            return "<No Coordinates>"
 
     # Do the same as above, but return as a string
     def find_coord_range_as_str(self, substr: str):
-        coords =  self.find_coord_range(substr)
+        coords = self.find_coord_range(substr)
         # If the coordinates ARE found
         if coords is not None:
-            return substr + ": " + str(coords['range'][0]) + "," + str(coords['range'][1]) + "; "\
-                   + str(self.orientation.value).upper() + ", " + self.directions_as_pretty_str()
+            start = coords['range'][0]; end = coords['range'][1]
+            all_coords = self.get_all_coords_in_range(start, end)
+
+            return substr + ": " + self.coord_list_to_str(all_coords)
 
     def directions_as_pretty_str(self):
         dir_s = "["
