@@ -157,7 +157,36 @@ class SearchableLine:
         self.directions = dirs
         self.width = self.line.__len__()
         self.xy_origin = xy_origin
-        # print(self)
+
+    # Find the coordinates of the given substring in the line field of this SearchableLine using its orientation and
+    # direction to determine these coordinates in relation to its position in a LetterMatrix
+    def find_coord_range(self, substr: str):
+        idx = self.line.find(substr)
+        # If idx is > -1, the substring IS in the string 'line' field
+        if idx > -1:
+            final_idx = 0
+            sub_len_1 = substr.__len__() - 1
+            last_point = Coordinate(0, 0)
+            if self.orientation == Orientation.HORIZONTAL and Direction.RIGHT in self.directions:
+                # Just add sub_len to x value of self.xy_origin for the last point; Add idx to x value of origin of
+                # the line
+                self.xy_origin.modify("x_col", "add", amount=idx)
+                last_point.update(self.xy_origin.x_col + sub_len_1, self.xy_origin.y_row)
+            elif self.orientation == Orientation.HORIZONTAL and Direction.LEFT in self.directions:
+                # Just subtract sub_len from the x value of self.xy_origin for the last point; Subtract idx from
+                # the x value of origin of the line
+                self.xy_origin.modify("x_col", "minus", amount=idx)
+                last_point.update(self.xy_origin.x_col - sub_len_1, self.xy_origin.y_row)
+
+            return {"range": [self.xy_origin, last_point]}
+
+    # Do the same as above, but return as a string
+    def find_coord_range_as_str(self, substr: str):
+        coords =  self.find_coord_range(substr)
+        # If the coordinates ARE found
+        if coords is not None:
+            return substr + ": " + str(coords['range'][0]) + "," + str(coords['range'][1]) + "; "\
+                   + str(self.orientation.value).upper() + ", " + self.directions_as_pretty_str()
 
     def directions_as_pretty_str(self):
         dir_s = "["
@@ -180,12 +209,18 @@ class SearchableLines:
     # On init, convert a matrix to a list of all searchable lines in the matrix
     def __init__(self, matrix: LetterMatrix):
         self.matrix = matrix
-        self.lines = []
-        self.matrix_to_searchable_strings()
+        # Add object to this list so there is a type associated with the objects in it for the IDE
+        # Remember to reset list to '[]' in first function call to add to this list
+        self.lines = [SearchableLine]
+        self.matrix_to_searchable_strings(reset=True)
 
     # Return the number of lines in the SearchableLines object
     def num_of_lines(self):
         return self.lines.__len__()
+
+    # Get the searchable line at index 'idx'
+    def get_sl(self, idx: int):
+        return self.lines[idx]
 
     # Return the diagonal string found with the given coordinate and coordinate operations
     # and return the end coordinate as a dict
@@ -199,7 +234,10 @@ class SearchableLines:
             cur_coord.modify("x_col", x_col_op); cur_coord.modify("y_row", y_row_op)
         return { "str": diag_s, "coord": end_coord }
 
-    def matrix_to_searchable_strings(self):
+    def matrix_to_searchable_strings(self, reset=False):
+        # Reset lines to empty list
+        if reset:
+            self.lines = []
         row_idx = 0
         # Grab each horizontal 'searchable line' in the letter matrix
         for row in self.matrix.rows:
@@ -300,14 +338,24 @@ class WordSearchPuzzle:
         # Remove new line character from end and/or any extra whitespace from end or start
         self.words[words_len-1] = self.words[words_len-1].strip()
         self.words[0] = self.words[0].strip()
+        self.words_loaded = True
 
     # Load all searchable lines in matrix
     def load_searchable_lines(self):
         self.searchable_lines = SearchableLines(self.matrix)
+        self.lines_loaded = True
 
-    # # Return the matrix in a readable string format
-    # def matrix_as_pretty_str(self, extra_tab=False):
-    #
+    # Solve the WordSearchPuzzle!
+    def solve(self):
+        if self.words_loaded and self.lines_loaded:
+            for word in self.words:
+                for searchable_line in self.searchable_lines.lines:
+                    # The searchable line string
+                    coords = searchable_line.find_coord_range_as_str(substr=word)
+                    # If it's not None, we have found the word in our searchable line!
+                    if coords is not None:
+                        print(coords)
+
 
     def __str__(self):
         return "WordSearchPuzzle {\n" + \
@@ -315,8 +363,3 @@ class WordSearchPuzzle:
                "\n\tWords: " + str(self.words) + ", " + \
                "\n\tMatrix: " + self.matrix.__str__(extra_tab=True) + \
                "\n\n}"
-
-
-# Solve the word search for the given WordSearchPuzzle
-def solve_word_search(puzzle: WordSearchPuzzle):
-    return None

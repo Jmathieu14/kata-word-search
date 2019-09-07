@@ -70,7 +70,10 @@ class TestWordSearchPuzzle(ut.TestCase):
         # Put test folder in path b/c tests will be run from main.py outside of test folder
         base_test_name = "test/$/ws-test-#-$.txt"
         test_files = self.get_test_files(base_test_name)
-        actual_out = ""
+        for f in test_files:
+            test_puzzle = ws.WordSearchPuzzle(f['in'])
+            actual_out = test_puzzle.solve()
+            expected_out = util.get_lines_from_file(f['out'])
         self.assertTrue(1, 1)
 
 
