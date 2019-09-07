@@ -13,7 +13,7 @@ def main():
     # Run the test_ws_1 test module
     wst1.run_tests()
     print("\nRunning Kata Word Search Project\n")
-    puzzle_path1 = "test/input/ws-test-1-input.txt"
+    puzzle_path1 = "input/readme-example-input.txt"
     puzzle1 = ws.WordSearchPuzzle(puzzle_path1)
     # print(puzzle1)
     # print(puzzle1.searchable_lines[0])
