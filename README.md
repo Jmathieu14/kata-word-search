@@ -98,7 +98,7 @@ An example of valid input can be found at `/input/readme-example-input.txt`.
 You can also run the program from the terminal, by typing:
 `python -m main input/my/filepath.txt`
 
-**Note** Tests are run by default on using the program. They are run with the following line of code
+**Note**: tests are run by default on running the program. They are run with the following line of code
 under the main() function of main.py: `Line 19: wst1.run_tests()`
 
 ## Future Considerations/TO-DO's ##
