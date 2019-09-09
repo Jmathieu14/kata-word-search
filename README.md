@@ -81,5 +81,15 @@ UHURA: (4,0),(3,1),(2,2),(1,3),(0,4)
 * Words will be a minimum of two letters long, and will always fit within the grid along the axis on which it can be located.
 
 ## Directions ##
-To run this program and solve a word puzzle, call the main function from main.py and input a valid word search table file.
-An example of valid input can be found at '/input/readme-example-input.txt'.
+>Built for Python version 3.6.0+
+
+Before running the program, make sure you have the following Python libraries and their latest versions installed:
+* simplejson
+* colorama
+* unittest
+
+To run this program from your IDE to solve a word puzzle, call the main function from main.py and input a valid word search table filepath.
+An example of valid input can be found at `/input/readme-example-input.txt`.
+
+You can also run the program from the terminal, by typing:
+`python -m main input/my/filepath.txt`

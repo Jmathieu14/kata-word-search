@@ -406,11 +406,15 @@ class WordSearchPuzzle:
 
     def __init__(self, path):
         self.path = path
-        # Load the letter matrix into an object from the file at the given path
-        self.matrix = LetterMatrix()
-        self.matrix.load_matrix(self.path)
-        self.load_words()
-        self.load_searchable_lines()
+        if util.does_file_exist(path):
+            # Load the letter matrix into an object from the file at the given path
+            self.matrix = LetterMatrix()
+            self.matrix.load_matrix(self.path)
+            self.load_words()
+            self.load_searchable_lines()
+        else:
+            print(">>Given invalid path: '" + path + "'")
+            exit(-1)
 
     def load_words(self):
         w_list_as_str = util.get_first_line(self.path)

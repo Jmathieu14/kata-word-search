@@ -14,9 +14,6 @@ from colorama import Fore, Back, Style
 MAX_TEST_CASES = 100
 MODULE_NAME = "test_ws_1"
 
-# Notify user test module is loaded
-print("Initialized " + MODULE_NAME + " test module\n")
-
 
 # Help on learning the unittest library from Source 1 (See bottom of file)
 # Run tests on word search function
