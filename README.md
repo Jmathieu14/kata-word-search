@@ -100,4 +100,12 @@ You can also run the program from the terminal, by typing:
 
 ## Future Considerations/TO-DO's ##
 * Separate classes in ws_func.py into different files
-* Add tests on each class for each of their functions
+* Add tests on each class for each of their functions. Examples of these functions include:
+>`SearchableLines.get_diag_str_plus_coord(), SearchableLines.matrix_to_searchable_strings(),
+SearchableLine.gen_coords_in_range(), SearchableLine.find_coords(), SearchableLine.coord_list_to_str(), 
+SearchableLine.find_coords_as_str(), ...`
+* Add more test puzzles
+* Test to see the largest puzzle that can be solved in a reasonable amount of time with
+this program, then put a limit on the size of the puzzle that can be accepted by the program
+* Add tests ensuring run time is under 'X' seconds or minutes for certain size puzzles
+* Make test runs in user's control (i.e. not run every time as one might do in development versions)

@@ -442,6 +442,9 @@ class WordSearchPuzzle:
                     if coords_str is not None:
                         solution = solution + coords_str + "\n"
             return solution
+        else:
+            print("The words or lines for the given puzzle were not loaded properly. Please check to make sure "+\
+                  "the format of the input file is correct.")
 
     def __str__(self):
         return "WordSearchPuzzle {\n" + \
