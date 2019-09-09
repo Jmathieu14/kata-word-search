@@ -19,7 +19,11 @@ def main(input_path=""):
         wst1.run_tests()
         print("\nRunning Kata Word Search Project\n")
         puzzle = ws.WordSearchPuzzle(input_path)
-        print(puzzle.solve())
+        solution_header = "Solution for '" + input_path + "' is:"
+        header_underline = "-" * solution_header.__len__()
+        solution_header = solution_header + "\n" + header_underline
+        print(solution_header)
+        print(puzzle.solve().strip())
 
 
 # Run the main method of the main file through IDE with specified file path

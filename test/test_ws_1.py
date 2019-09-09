@@ -71,6 +71,13 @@ class TestWordSearchPuzzle(ut.TestCase):
             test_puzzle = ws.WordSearchPuzzle(f['in'])
             actual_out = test_puzzle.solve()
             expected_out = util.get_lines_as_str_from_file(f['out'])
+            # Split each out into *sets* of each new line in the string
+            actual_out = actual_out.split("\n"); actual_out = set(actual_out)
+            expected_out = expected_out.split("\n"); expected_out = set(expected_out)
+            # Remove any empty lines in each set
+            actual_out.remove(''); expected_out.remove('')
+            # Assert that they are equal as SETS, as sets do not have order, thus the order of the solution printed out
+            # is unimportant
             self.assertEqual(actual_out, expected_out, msg="The actual out does NOT equal the expected out.")
 
 

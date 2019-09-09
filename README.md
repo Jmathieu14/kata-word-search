@@ -88,8 +88,16 @@ Before running the program, make sure you have the following Python libraries an
 * colorama
 * unittest
 
+You can install these libraries using pip. With pip, the command line input should look like this: `pip install simplejson colorama unittest`
+>To install pip, follow the guide at this link: https://pip.pypa.io/en/stable/installing/
+
+
 To run this program from your IDE to solve a word puzzle, call the main function from main.py and input a valid word search table filepath.
 An example of valid input can be found at `/input/readme-example-input.txt`.
 
 You can also run the program from the terminal, by typing:
 `python -m main input/my/filepath.txt`
+
+## Future Considerations/TO-DO's ##
+* Separate classes in ws_func.py into different files
+* Add tests on each class for each of their functions
